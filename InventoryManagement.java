@@ -61,21 +61,10 @@ public class InventoryManagement {
                     hapusProduk();
                     break;
                 case 5:
-                    // ARUL: KERJAIN BAGIAN INI RUL!
-                    // Fungsi: cariProduk()
-                    // - Tampilkan submenu: cari by nama, merek, atau kategori
-                    // - Input keyword dari user
-                    // - Loop inventory, cek yang match
-                    // - Tampilkan hasil pencarian
-                    // System.out.println(">>> FITUR INI DIKERJAIN ARUL <<<");
                     searchProduct();
                     break;
                 case 6:
-                    // Fungsi: sortProduk()
-                    // - Tampilkan submenu: sort by nama, harga, atau stok
-                    // - Pake Collections.sort() dengan Comparator
-                    // - Tampilkan hasil sorting
-                    System.out.println(">>> FITUR INI DIKERJAIN ARUL <<<");
+                    sortProduct();
                     break;
                 case 7:
                     // Fungsi: prosesTransaksi()
@@ -114,8 +103,8 @@ public class InventoryManagement {
         System.out.println("2. Tampilkan Semua Produk");
         System.out.println("3. Edit Produk");
         System.out.println("4. Hapus Produk");
-        System.out.println("5. Cari Produk (ARUL)");
-        System.out.println("6. Urutkan Produk (ARUL)");
+        System.out.println("5. Cari Produk");
+        System.out.println("6. Urutkan Produk");
         System.out.println("7. Proses Transaksi (ARUL)");
         System.out.println("8. Tampilkan Laporan");
         System.out.println("0. Keluar");
@@ -344,26 +333,19 @@ public class InventoryManagement {
         System.out.println("\n═══ CARI PRODUK ═══");
         switch(pilihan) {
             case 0: // Cancel Searching Product
-                System.out.print("[DEBUG] Pencarian product dibatalkan!");
+                System.out.println("✗ Pencarian product dibatalkan!");
                 return;
             case 1: // ID Produk
-                System.out.print("Masukkan ID: ");
-                searchProductByID(scanner.nextInt());
-                scanner.nextLine();
+                searchProductByID();
                 break;
             case 2: // Nama Produk
-                System.out.print("Masukkan Nama: ");
-                searchProductByName(scanner.nextLine());
+                searchProductByName();
                 break;
             case 3: // Merek Produk
-                tampilkanMerekTersedia();
-                System.out.print("Masukkan Merek: ");
-                searchProductByBrand(scanner.nextLine());
+                searchProductByBrand();
                 break;
             case 4: // Kategori Produk
-                tampilkanKategoriTersedia();
-                System.out.print("Masukkan Kategori: ");
-                searchProductByCategory(scanner.nextLine());
+                searchProductByCategory();
                 break;
             default:
                 System.out.println("Pilihan tidak valid!");
@@ -373,74 +355,15 @@ public class InventoryManagement {
 
     }
 
-    // Fungsi tampilkanKategoriTersdia
-    static void tampilkanKategoriTersedia() {
-        System.out.println("[DEBUG] Berikut adalah daftar list kategori yang tersedia:");
+    // ========== FUNGSI SEARCH PRODUCT BY ID ==========
+    static void searchProductByID() {
+        // Input keyword kategori
+        System.out.print("\nMasukkan ID: ");
+        int keyword = scanner.nextInt();
+        scanner.nextLine();
 
-        ArrayList<String> listKategori = new ArrayList<>();
-
-        for (Product p : inventory) {
-            // Mencegah duplicate kategori
-            boolean kategoriSudahAda = false;
-            for (String ktg : listKategori) {
-                // Menggunakan equalsIgnoreCase agar jika ada kategori "laptop" akan di anggap sama dgn "Laptop"
-                if (ktg.equalsIgnoreCase(p.kategori)) {
-                   kategoriSudahAda = true;
-                   break; 
-                }
-            }
-            
-            if (!kategoriSudahAda) {
-                listKategori.add(p.kategori);
-            }
-        }
-
-        // Menampilkan list kategori yang tersedianya
-        if (listKategori.isEmpty()) {
-            System.out.println("[DEBUG] Belum ada kategori!");
-        } else {
-            for (int i = 0; i < listKategori.size(); i++) {
-                System.out.println(" - " + listKategori.get(i));
-            }
-        }
-    }
-    
-    // Fungsi tampilkaMerekiTersdia
-    static void tampilkanMerekTersedia() {
-        System.out.println("[DEBUG] Berikut adalah daftar list merek yang tersedia:");
-
-        ArrayList<String> listMerek = new ArrayList<>();
-
-        for (Product p : inventory) {
-            // Mencegah duplicate merek
-            boolean merekSudahAda = false;
-            for (String mrk : listMerek) {
-                // Menggunakan equalsIgnoreCase agar jika ada merek "laptop" akan di anggap sama dgn "Laptop"
-                if (mrk.equalsIgnoreCase(p.merek)) {
-                   merekSudahAda = true;
-                   break; 
-                }
-            }
-            
-            if (!merekSudahAda) {
-                listMerek.add(p.merek);
-            }
-        }
-
-        // Menampilkan list merek yang tersedianya
-        if (listMerek.isEmpty()) {
-            System.out.println("[DEBUG] Belum ada merek!");
-        } else {
-            for (int i = 0; i < listMerek.size(); i++) {
-                System.out.println(" - " + listMerek.get(i));
-            }
-        }
-    }
-
-    // Searching Product by ID
-    static void searchProductByID(int keyword) {
         boolean keywordFound = false;
-        System.out.println("[DEBUG] Hasil pencarian berdasarkan keyword id produk: ");
+        System.out.println("\n[DEBUG] Memproses pencarian untuk id: '" + keyword + "'");
         for (Product p : inventory) {
             if (p.id == keyword) {
                 if (!keywordFound) { // langsung stop menampilkan headernya kalau udah ketemu
@@ -452,16 +375,20 @@ public class InventoryManagement {
         }
     
         if (!keywordFound) {  // menampilkan message kalo ga ketemu
-            System.out.println("[DEBUG] [X] ID produk dengan keyword '" + keyword + "' tidak ditemukan!");
+            System.out.println("[DEBUG] ✗ Produk dengan ID '" + keyword + "' tidak ditemukan!");
         } else {
             tampilkanFooter();
         }
     }
 
-    // Searching Product by Name
-    static void searchProductByName(String keyword) {
+    // ========== FUNGSI SEARCH PRODUCT BY NAME ==========
+    static void searchProductByName() {
+        // Input keyword kategori
+        System.out.print("\nMasukkan nama: ");
+        String keyword = scanner.nextLine();
+
         boolean keywordFound = false;
-        System.out.println("[DEBUG] Hasil pencarian berdasarkan keyword nama produk: ");
+        System.out.println("\n[DEBUG] Memproses pencarian untuk nama: '" + keyword + "'");
         for (Product p : inventory) {
             // biar ga case-sensitive make toLowerCase()
             if (p.nama.toLowerCase().contains(keyword.toLowerCase())) {
@@ -474,16 +401,46 @@ public class InventoryManagement {
         }
     
         if (!keywordFound) {  // menampilkan message kalo ga ketemu
-            System.out.println("[DEBUG] [X] Nama produk dengan keyword '" + keyword + "' tidak ditemukan!");
+            System.out.println("[DEBUG] ✗ Produk dengan Nama '" + keyword + "' tidak ditemukan!");
         } else {
             tampilkanFooter();
         }
     }
 
-    // Searching Product by Brand
-    static void searchProductByBrand(String keyword) {
+    // ========== FUNGSI SEARCH PRODUCT BY BRAND ==========
+    static void searchProductByBrand() {
+        ArrayList<String> listMerek = new ArrayList<>();
+
+        for (Product p : inventory) {
+            boolean merekSudahAda = false;
+            for (String mrk : listMerek) {
+                if (mrk.equalsIgnoreCase(p.merek)) {
+                    merekSudahAda = true;
+                    break;
+                }
+            }
+            if (!merekSudahAda) {
+                listMerek.add(p.merek);
+            }
+        }
+        
+        if (listMerek.isEmpty()) {
+            System.out.println("Belum ada data produk/merek!");
+            return; // Kembali ke menu awal
+        }
+
+        // Tampilkan list kategori
+        System.out.println("Daftar merek yang tersedia:");
+        for (String mrk : listMerek) {
+            System.out.println(" - " + mrk);
+        }
+
+        // Input keyword kategori
+        System.out.print("\nMasukkan merek: ");
+        String keyword = scanner.nextLine();
+
         boolean keywordFound = false;
-        System.out.println("[DEBUG] Hasil pencarian berdasarkan keyword merek produk: ");
+        System.out.println("\n[DEBUG] Memproses pencarian untuk merek: '" + keyword + "'");
         for (Product p : inventory) {
             // biar ga case-sensitive make toLowerCase()
             if (p.merek.toLowerCase().equals(keyword.toLowerCase())) {
@@ -496,19 +453,49 @@ public class InventoryManagement {
         }
     
         if (!keywordFound) {  // menampilkan message kalo ga ketemu
-            System.out.println("[DEBUG] [X] Merek produk dengan keyword '" + keyword + "' tidak ditemukan!");
+            System.out.println("[DEBUG] ✗ Produk dengan merek '" + keyword + "' tidak ditemukan!");
         } else {
             tampilkanFooter();
         }
     }
 
-    // Searching Product by Category
-    static void searchProductByCategory(String keyword) {
-        boolean keywordFound = false;
-        System.out.println("[DEBUG] Hasil pencarian berdasarkan keyword kategori produk: ");
+    // ========== FUNGSI SEARCH PRODUCT BY CATEGORY ==========
+    static void searchProductByCategory() {
+        ArrayList<String> listKategori = new ArrayList<>();
+
         for (Product p : inventory) {
-            // biar ga case-sensitive make toLowerCase()
-            if (p.kategori.toLowerCase().equals(keyword.toLowerCase())) {
+            boolean kategoriSudahAda = false;
+            for (String ktg : listKategori) {
+                if (ktg.equalsIgnoreCase(p.kategori)) {
+                    kategoriSudahAda = true;
+                    break;
+                }
+            }
+            if (!kategoriSudahAda) {
+                listKategori.add(p.kategori);
+            }
+        }
+        
+        if (listKategori.isEmpty()) {
+            System.out.println("Belum ada data produk/kategori!");
+            return; // Kembali ke menu awal
+        }
+
+        // Tampilkan list kategori
+        System.out.println("Daftar kategori yang tersedia:");
+        for (String ktg : listKategori) {
+            System.out.println(" - " + ktg);
+        }
+
+        // Input keyword kategori
+        System.out.print("\nMasukkan kategori: ");
+        String keyword = scanner.nextLine();
+
+        // Tampilkan hasil searching produk
+        boolean keywordFound = false;
+        System.out.println("\n[DEBUG] Memproses pencarian untuk kategori: '" + keyword + "'");
+        for (Product p : inventory) {
+            if (p.kategori.equalsIgnoreCase(keyword)) {
                 if (!keywordFound) { // langsung stop menampilkan headernya kalau udah ketemu
                     tampilkanHeader();
                 }
@@ -516,14 +503,362 @@ public class InventoryManagement {
                 keywordFound = true;
             }
         }
-    
         if (!keywordFound) {  // menampilkan message kalo ga ketemu
-            System.out.println("[DEBUG] [X] Kategori produk dengan keyword '" + keyword + "' tidak ditemukan!");
+            System.out.println("[DEBUG] ✗ Produk dengan Kategori '" + keyword + "' tidak ditemukan!");
         } else {
             tampilkanFooter();
         }
     }
+
+    // Function sortingProduct
+    static void sortProduct() {
+        System.out.println("═══ URUTKAN PRODUK ═══");
+        System.out.println("Pilih urutkan produk berdasarkan:");
+        System.out.println(" 1. ID");
+        System.out.println(" 2. Nama");
+        System.out.println(" 3. Merek");
+        System.out.println(" 4. Kategori");
+        System.out.println(" 5. Harga");
+        System.out.println(" 6. Stok");
+        System.out.println(" 0. Batalkan Pengurutan");
+        System.out.print("Pilihan: ");
+        int pilihan = scanner.nextInt();
+        scanner.nextLine();
+        
+        System.out.println("\n═══ URUTKAN PRODUK ═══");
+        switch(pilihan) {
+            case 0: // Cancel Searching Product
+                System.out.println("✗ Pengurutan product dibatalkan!");
+                return;
+            case 1: // ID Produk
+                sortProductByID();
+                break;
+            case 2: // Nama Produk
+                sortProductByName();
+                break;
+            case 3: // Merek Produk
+                sortProductByBrand();
+                break;
+            case 4: // Kategori Produk
+                sortProductByCategory();
+                break;
+            case 5: // Harga Produk
+                sortProductByCategory();
+                break;
+            case 6: // Stok Produk
+                sortProductByCategory();
+                break;
+            default:
+                System.out.println("Pilihan tidak valid!");
+                return;
+        }
+
+    }
+
+    // Insertion Sorting by ID
+    static void sortProductByID() {
+        String metodeSorting = "";
+        System.out.println("Pilih metode pengurutan produk:");
+        System.out.println(" 1. Ascending");
+        System.out.println(" 2. Descending");
+        System.out.println(" 0. Batalkan Pengurutan");
+        System.out.print("Pilihan: ");
+        int pilihan = scanner.nextInt();
+        scanner.nextLine();
+        
+        switch(pilihan) {
+            case 0: 
+                System.out.println("✗ Pengurutan product dibatalkan!");
+                return;
+            case 1:
+                break;
+            case 2:
+                break;
+            default:
+                System.out.println("Pilihan tidak valid!");
+                return;
+        }
+
+        // Proccess Insertion Sorting
+        int pass = 1;
+        while (pass < inventory.size()) {
+            Product temp = inventory.get(pass);
+            int i = pass;
+            // Ascending
+            if (metodeSorting.equals("ascending")) {
+                while ((i > 0) && (temp.id < inventory.get(i-1).id)) {
+                    inventory.set(i, inventory.get(i-1));
+                    i--;
+                }
+            }
+            // Descending
+            else if (metodeSorting.equals("descending")) {
+                while ((i > 0) && (temp.id > inventory.get(i-1).id)) {
+                    inventory.set(i, inventory.get(i-1));
+                    i--;
+                }
+            }
+            inventory.set(i, temp);
+            pass++;
+        }
+        System.out.println("[DEBUG] Produk berhasil diurutkan berdasarkan ID secara descending!");
+    }
+
+    // Insertion Sorting by Name
+    static void sortProductByName() {
+        String metodeSorting = "";
+        System.out.println("Pilih metode pengurutan produk:");
+        System.out.println(" 1. Ascending");
+        System.out.println(" 2. Descending");
+        System.out.println(" 0. Batalkan Pengurutan");
+        System.out.print("Pilihan: ");
+        int pilihan = scanner.nextInt();
+        scanner.nextLine();
+        
+        switch(pilihan) {
+            case 0: 
+                System.out.println("✗ Pengurutan product dibatalkan!");
+                return;
+            case 1:
+                metodeSorting = "ascending";
+                break;
+            case 2:
+                metodeSorting = "descending";
+                break;
+            default:
+                System.out.println("Pilihan tidak valid!");
+                return;
+        }
+
+        // Proccess Insertion Sorting
+        int pass = 1;
+        while (pass < inventory.size()) {
+            Product temp = inventory.get(pass);
+            int i = pass;
+            // Ascending
+            if (metodeSorting.equals("ascending")) {
+                // Untuk memabndingkan huruf dri sebuah string menggunakan compareToIgnoreCase()
+                while ((i > 0) && (temp.nama.compareToIgnoreCase(inventory.get(i-1).nama) < 0)) {
+                    inventory.set(i, inventory.get(i-1));
+                    i--;
+                }
+            }
+            // Descending
+            else if (metodeSorting.equals("descending")) {
+                while ((i > 0) && (temp.nama.compareToIgnoreCase(inventory.get(i-1).nama) > 0)) {
+                    inventory.set(i, inventory.get(i-1));
+                    i--;
+                }
+            }
+            inventory.set(i, temp);
+            pass++;
+        }
+        System.out.printf("[DEBUG] Produk berhasil diurutkan berdasarkan Nama secara %s!\n", metodeSorting);
+    }
+
+    // Insertion Sorting by Brand
+    static void sortProductByBrand() {
+        String metodeSorting = "";
+        System.out.println("Pilih metode pengurutan produk:");
+        System.out.println(" 1. Ascending");
+        System.out.println(" 2. Descending");
+        System.out.println(" 0. Batalkan Pengurutan");
+        System.out.print("Pilihan: ");
+        int pilihan = scanner.nextInt();
+        scanner.nextLine();
+        
+        switch(pilihan) {
+            case 0: 
+                System.out.println("✗ Pengurutan product dibatalkan!");
+                return;
+            case 1:
+                metodeSorting = "ascending";
+                break;
+            case 2:
+                metodeSorting = "descending";
+                break;
+            default:
+                System.out.println("Pilihan tidak valid!");
+                return;
+        }
+
+        // Proccess Insertion Sorting
+        int pass = 1;
+        while (pass < inventory.size()) {
+            Product temp = inventory.get(pass);
+            int i = pass;
+            // Ascending
+            if (metodeSorting.equals("ascending")) {
+                // Untuk memabndingkan huruf dri sebuah string menggunakan compareToIgnoreCase()
+                while ((i > 0) && (temp.merek.compareToIgnoreCase(inventory.get(i-1).merek) < 0)) {
+                    inventory.set(i, inventory.get(i-1));
+                    i--;
+                }
+            }
+            // Descending
+            else if (metodeSorting.equals("descending")) {
+                while ((i > 0) && (temp.merek.compareToIgnoreCase(inventory.get(i-1).merek) > 0)) {
+                    inventory.set(i, inventory.get(i-1));
+                    i--;
+                }
+            }
+            inventory.set(i, temp);
+            pass++;
+        }
+        System.out.printf("[DEBUG] Produk berhasil diurutkan berdasarkan Merek secara %s!\n", metodeSorting);
+    }
+
+    // Insertion Sorting by Category
+    static void sortProductByCategory() {
+        String metodeSorting = "";
+        System.out.println("Pilih metode pengurutan produk:");
+        System.out.println(" 1. Ascending");
+        System.out.println(" 2. Descending");
+        System.out.println(" 0. Batalkan Pengurutan");
+        System.out.print("Pilihan: ");
+        int pilihan = scanner.nextInt();
+        scanner.nextLine();
+        
+        switch(pilihan) {
+            case 0: 
+                System.out.println("✗ Pengurutan product dibatalkan!");
+                return;
+            case 1:
+                metodeSorting = "ascending";
+                break;
+            case 2:
+                metodeSorting = "descending";
+                break;
+            default:
+                System.out.println("Pilihan tidak valid!");
+                return;
+        }
+
+        // Proccess Insertion Sorting
+        int pass = 1;
+        while (pass < inventory.size()) {
+            Product temp = inventory.get(pass);
+            int i = pass;
+            // Ascending
+            if (metodeSorting.equals("ascending")) {
+                // Untuk memabndingkan huruf dri sebuah string menggunakan compareToIgnoreCase()
+                while ((i > 0) && (temp.kategori.compareToIgnoreCase(inventory.get(i-1).kategori) < 0)) {
+                    inventory.set(i, inventory.get(i-1));
+                    i--;
+                }
+            }
+            // Descending
+            else if (metodeSorting.equals("descending")) {
+                while ((i > 0) && (temp.kategori.compareToIgnoreCase(inventory.get(i-1).kategori) > 0)) {
+                    inventory.set(i, inventory.get(i-1));
+                    i--;
+                }
+            }
+            inventory.set(i, temp);
+            pass++;
+        }
+        System.out.printf("[DEBUG] Produk berhasil diurutkan berdasarkan Kategori secara %s!\n", metodeSorting);
+    }
     
+    // Insertion Sorting by Price
+    static void sortProductByPrice() {
+        String metodeSorting = "";
+        System.out.println("Pilih metode pengurutan produk:");
+        System.out.println(" 1. Ascending");
+        System.out.println(" 2. Descending");
+        System.out.println(" 0. Batalkan Pengurutan");
+        System.out.print("Pilihan: ");
+        int pilihan = scanner.nextInt();
+        scanner.nextLine();
+        
+        switch(pilihan) {
+            case 0: 
+                System.out.println("✗ Pengurutan product dibatalkan!");
+                return;
+            case 1:
+                break;
+            case 2:
+                break;
+            default:
+                System.out.println("Pilihan tidak valid!");
+                return;
+        }
+
+        // Proccess Insertion Sorting
+        int pass = 1;
+        while (pass < inventory.size()) {
+            Product temp = inventory.get(pass);
+            int i = pass;
+            // Ascending
+            if (metodeSorting.equals("ascending")) {
+                while ((i > 0) && (temp.harga < inventory.get(i-1).harga)) {
+                    inventory.set(i, inventory.get(i-1));
+                    i--;
+                }
+            }
+            // Descending
+            else if (metodeSorting.equals("descending")) {
+                while ((i > 0) && (temp.harga > inventory.get(i-1).harga)) {
+                    inventory.set(i, inventory.get(i-1));
+                    i--;
+                }
+            }
+            inventory.set(i, temp);
+            pass++;
+        }
+        System.out.println("[DEBUG] Produk berhasil diurutkan berdasarkan Harga secara descending!");
+    }
+    
+    // Insertion Sorting by Stock
+    static void sortProductByStock() {
+        String metodeSorting = "";
+        System.out.println("Pilih metode pengurutan produk:");
+        System.out.println(" 1. Ascending");
+        System.out.println(" 2. Descending");
+        System.out.println(" 0. Batalkan Pengurutan");
+        System.out.print("Pilihan: ");
+        int pilihan = scanner.nextInt();
+        scanner.nextLine();
+        
+        switch(pilihan) {
+            case 0: 
+                System.out.println("✗ Pengurutan product dibatalkan!");
+                return;
+            case 1:
+                break;
+            case 2:
+                break;
+            default:
+                System.out.println("Pilihan tidak valid!");
+                return;
+        }
+
+        // Proccess Insertion Sorting
+        int pass = 1;
+        while (pass < inventory.size()) {
+            Product temp = inventory.get(pass);
+            int i = pass;
+            // Ascending
+            if (metodeSorting.equals("ascending")) {
+                while ((i > 0) && (temp.stok < inventory.get(i-1).stok)) {
+                    inventory.set(i, inventory.get(i-1));
+                    i--;
+                }
+            }
+            // Descending
+            else if (metodeSorting.equals("descending")) {
+                while ((i > 0) && (temp.stok > inventory.get(i-1).stok)) {
+                    inventory.set(i, inventory.get(i-1));
+                    i--;
+                }
+            }
+            inventory.set(i, temp);
+            pass++;
+        }
+        System.out.println("[DEBUG] Produk berhasil diurutkan berdasarkan Stok secara descending!");
+    }
+
+
     static void tampilkanHeader() {
         System.out.println("┌──────┬──────────────────────┬─────────────────┬─────────────────┬────────────────┬───────┐");
         System.out.println("│  ID  │ Nama Produk          │ Merek           │ Kategori        │ Harga          │ Stok  │");
