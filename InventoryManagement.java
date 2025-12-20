@@ -70,7 +70,6 @@ public class InventoryManagement {
                     System.out.println(">>> FITUR INI DIKERJAIN ARUL <<<");
                     break;
                 case 6:
-                    // ARUL: KERJAIN BAGIAN INI RUL!
                     // Fungsi: sortProduk()
                     // - Tampilkan submenu: sort by nama, harga, atau stok
                     // - Pake Collections.sort() dengan Comparator
@@ -78,7 +77,6 @@ public class InventoryManagement {
                     System.out.println(">>> FITUR INI DIKERJAIN ARUL <<<");
                     break;
                 case 7:
-                    // ARUL: KERJAIN BAGIAN INI RUL!
                     // Fungsi: prosesTransaksi()
                     // - Input ID produk & jumlah beli
                     // - Validasi stok cukup atau engga
