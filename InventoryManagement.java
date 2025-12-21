@@ -1,14 +1,16 @@
-import java.util.ArrayList;
 import java.util.Scanner;
 
 public class InventoryManagement {
     
-    // variabel global biar gampang dipake di semua menu
-    static ArrayList<Product> inventory = new ArrayList<>();
+    // Data storage diganti ke Array biasa
+    static final int MAX_PRODUK = 100; // Kapasitas maksimal array
+    static Product[] inventory = new Product[MAX_PRODUK];
+    static int productCount = 0; // Untuk melacak jumlah produk saat ini
+    
     static Scanner scanner = new Scanner(System.in);
     static int nextId = 1;  // buat auto increment ID produk
     
-    // class sederhana buat nampung data produk
+    // Kelas buat nyimpen data produk
     static class Product {
         int id;
         String nama;
@@ -91,7 +93,7 @@ public class InventoryManagement {
         scanner.close();
     }
     
-    // // menu utama, isinya cmn tampilan  pilihan user
+    // Tampilin menu utama
     static void tampilkanMenu() {
         System.out.println("\n╔════════════════════════════════════════════════╗");
         System.out.println("║   SISTEM MANAJEMEN INVENTARIS TOKO ELEKTRONIK  ║");
@@ -108,8 +110,13 @@ public class InventoryManagement {
         System.out.println("════════════════════════════════════════════════");
     }
     
-    // input produk baru dari user
+    // Tambah produk manual lewat input user
     static void tambahProduk() {
+        if (productCount >= MAX_PRODUK) {
+            System.out.println("Kapasitas inventory penuh!");
+            return;
+        }
+
         System.out.println("═══ TAMBAH PRODUK BARU ═══");
         
         System.out.print("Nama Produk: ");
@@ -129,19 +136,26 @@ public class InventoryManagement {
         scanner.nextLine(); // bersihin newline setelah nextInt
         
         Product produkBaru = new Product(nextId++, nama, merek, kategori, harga, stok);
-        inventory.add(produkBaru);
+        
+        // Ganti inventory.add() dengan array assignment
+        inventory[productCount] = produkBaru;
+        productCount++;
         
         System.out.println("\n✓ Produk berhasil ditambahkan dengan ID: " + produkBaru.id);
     }
     
     // Fungsi bantu buat nambahin data awal (biar gak repot demo)
     static void tambahProdukOtomatis(String nama, String merek, String kategori, double harga, int stok) {
-        inventory.add(new Product(nextId++, nama, merek, kategori, harga, stok));
+        if (productCount < MAX_PRODUK) {
+            inventory[productCount] = new Product(nextId++, nama, merek, kategori, harga, stok);
+            productCount++;
+        }
     }
     
     // Tampilin semua produk dalam bentuk tabel
     static void tampilkanSemuaProduk() {
-        if(inventory.isEmpty()) {
+        // Ganti isEmpty() dengan cek count
+        if(productCount == 0) {
             System.out.println("Inventory masih kosong!");
             return;
         }
@@ -149,8 +163,9 @@ public class InventoryManagement {
         System.out.println("═══ DAFTAR SEMUA PRODUK ═══");
         tampilkanHeader();
         
-        for(Product p : inventory) {
-            p.displayInfo();
+        // Loop manual menggunakan index
+        for(int i = 0; i < productCount; i++) {
+            inventory[i].displayInfo();
         }
         
         tampilkanFooter();
@@ -231,7 +246,7 @@ public class InventoryManagement {
         System.out.println("\n✓ Produk berhasil diupdate!");
     }
     
-    // hapus produk, pake konfirmasi biar gak kehapus salah
+    // Hapus produk berdasarkan ID (ada konfirmasi dulu)
     static void hapusProduk() {
         System.out.println("═══ HAPUS PRODUK ═══");
         
@@ -239,12 +254,21 @@ public class InventoryManagement {
         int id = scanner.nextInt();
         scanner.nextLine();
         
-        Product produk = cariProdukById(id);
+        // Cari indexnya dulu
+        int indexFound = -1;
+        for (int i = 0; i < productCount; i++) {
+            if (inventory[i].id == id) {
+                indexFound = i;
+                break;
+            }
+        }
         
-        if(produk == null) {
+        if(indexFound == -1) {
             System.out.println("✗ Produk dengan ID " + id + " tidak ditemukan!");
             return;
         }
+        
+        Product produk = inventory[indexFound];
         
         System.out.println("\nProduk yang akan dihapus:");
         tampilkanHeader();
@@ -255,7 +279,13 @@ public class InventoryManagement {
         String konfirmasi = scanner.nextLine();
         
         if(konfirmasi.equalsIgnoreCase("y")) {
-            inventory.remove(produk);
+            // Logic hapus di array: geser semua elemen setelah index ke kiri
+            for (int i = indexFound; i < productCount - 1; i++) {
+                inventory[i] = inventory[i + 1];
+            }
+            inventory[productCount - 1] = null; // Hapus referensi terakhir
+            productCount--; // Kurangi jumlah
+            
             System.out.println("✓ Produk berhasil dihapus!");
         } else {
             System.out.println("Penghapusan dibatalkan.");
@@ -264,18 +294,19 @@ public class InventoryManagement {
     
     // Tampilin laporan: total produk, total stok, total nilai, dan stok menipis
     static void tampilkanLaporan() {
-        if(inventory.isEmpty()) {
+        if(productCount == 0) {
             System.out.println("Inventory masih kosong!");
             return;
         }
         
         System.out.println("═══ LAPORAN INVENTARIS ═══");
         
-        int totalProduk = inventory.size();
+        int totalProduk = productCount;
         int totalStok = 0;
         double totalNilai = 0;
         
-        for(Product p : inventory) {
+        for(int i = 0; i < productCount; i++) {
+            Product p = inventory[i];
             totalStok += p.stok;
             totalNilai += (p.harga * p.stok);
         }
@@ -287,7 +318,8 @@ public class InventoryManagement {
         System.out.println("\n--- Produk dengan Stok Menipis (< 5) ---");
         boolean adaStokMenipis = false;
         
-        for(Product p : inventory) {
+        for(int i = 0; i < productCount; i++) {
+            Product p = inventory[i];
             if(p.stok < 5) {
                 if(!adaStokMenipis) {
                     tampilkanHeader();
@@ -306,15 +338,15 @@ public class InventoryManagement {
     
     // Cari produk berdasarkan ID (return null kalo gak ketemu)
     static Product cariProdukById(int id) {
-        for(Product p : inventory) {
-            if(p.id == id) {
-                return p;
+        for(int i = 0; i < productCount; i++) {
+            if(inventory[i].id == id) {
+                return inventory[i];
             }
         }
         return null;
     }
     
-    // Menu utama pencarian: pilih mau cari pake ID, nama, merek, atau kategori bebas tergantung user
+    // Menu utama pencarian: pilih mau cari pake ID, nama, merek, atau kategori
     static void searchProduct() {
         System.out.println("═══ CARI PRODUK ═══");
         System.out.println("Pilih pencarian berdasarkan:");
@@ -350,14 +382,15 @@ public class InventoryManagement {
         }
     }
 
-    /// pake exact match karena ID pasti unik
+    // Cari produk berdasarkan ID (exact match)
     static void searchProductByID() {
         System.out.print("\nMasukkan ID: ");
         int keyword = scanner.nextInt();
         scanner.nextLine();
 
         boolean keywordFound = false;
-        for (Product p : inventory) {
+        for (int i = 0; i < productCount; i++) {
+            Product p = inventory[i];
             if (p.id == keyword) {
                 if (!keywordFound) {
                     tampilkanHeader();
@@ -380,7 +413,8 @@ public class InventoryManagement {
         String keyword = scanner.nextLine();
 
         boolean keywordFound = false;
-        for (Product p : inventory) {
+        for (int i = 0; i < productCount; i++) {
+            Product p = inventory[i];
             if (p.nama.toLowerCase().contains(keyword.toLowerCase())) {
                 if (!keywordFound) {
                     tampilkanHeader();
@@ -399,37 +433,41 @@ public class InventoryManagement {
 
     // Cari produk berdasarkan merek (tampilin dulu list merek yang ada)
     static void searchProductByBrand() {
-        // Ambil semua merek unik buat ditampilin
-        ArrayList<String> listMerek = new ArrayList<>();
+        // Ganti ArrayList dengan Array string biasa
+        String[] listMerek = new String[productCount];
+        int countMerek = 0;
 
-        for (Product p : inventory) {
+        for (int i = 0; i < productCount; i++) {
+            Product p = inventory[i];
             boolean merekSudahAda = false;
-            for (String mrk : listMerek) {
-                if (mrk.equalsIgnoreCase(p.merek)) {
+            // Cek manual di array listMerek
+            for (int j = 0; j < countMerek; j++) {
+                if (listMerek[j].equalsIgnoreCase(p.merek)) {
                     merekSudahAda = true;
                     break;
                 }
             }
             if (!merekSudahAda) {
-                listMerek.add(p.merek);
+                listMerek[countMerek++] = p.merek;
             }
         }
         
-        if (listMerek.isEmpty()) {
+        if (countMerek == 0) {
             System.out.println("Belum ada data produk/merek!");
             return;
         }
 
         System.out.println("Daftar merek yang tersedia:");
-        for (String mrk : listMerek) {
-            System.out.println(" - " + mrk);
+        for (int i = 0; i < countMerek; i++) {
+            System.out.println(" - " + listMerek[i]);
         }
 
         System.out.print("\nMasukkan merek: ");
         String keyword = scanner.nextLine();
 
         boolean keywordFound = false;
-        for (Product p : inventory) {
+        for (int i = 0; i < productCount; i++) {
+            Product p = inventory[i];
             if (p.merek.toLowerCase().equals(keyword.toLowerCase())) {
                 if (!keywordFound) {
                     tampilkanHeader();
@@ -448,36 +486,41 @@ public class InventoryManagement {
 
     // Cari produk berdasarkan kategori (tampilin dulu list kategori yang ada)
     static void searchProductByCategory() {
-        ArrayList<String> listKategori = new ArrayList<>();
+        // Ganti ArrayList dengan Array string biasa
+        String[] listKategori = new String[productCount];
+        int countKategori = 0;
 
-        for (Product p : inventory) {
+        for (int i = 0; i < productCount; i++) {
+            Product p = inventory[i];
             boolean kategoriSudahAda = false;
-            for (String ktg : listKategori) {
-                if (ktg.equalsIgnoreCase(p.kategori)) {
+            // Cek manual di array
+            for (int j = 0; j < countKategori; j++) {
+                if (listKategori[j].equalsIgnoreCase(p.kategori)) {
                     kategoriSudahAda = true;
                     break;
                 }
             }
             if (!kategoriSudahAda) {
-                listKategori.add(p.kategori);
+                listKategori[countKategori++] = p.kategori;
             }
         }
         
-        if (listKategori.isEmpty()) {
+        if (countKategori == 0) {
             System.out.println("Belum ada data produk/kategori!");
             return;
         }
 
         System.out.println("Daftar kategori yang tersedia:");
-        for (String ktg : listKategori) {
-            System.out.println(" - " + ktg);
+        for (int i = 0; i < countKategori; i++) {
+            System.out.println(" - " + listKategori[i]);
         }
 
         System.out.print("\nMasukkan kategori: ");
         String keyword = scanner.nextLine();
 
         boolean keywordFound = false;
-        for (Product p : inventory) {
+        for (int i = 0; i < productCount; i++) {
+            Product p = inventory[i];
             if (p.kategori.equalsIgnoreCase(keyword)) {
                 if (!keywordFound) {
                     tampilkanHeader();
@@ -493,8 +536,7 @@ public class InventoryManagement {
         }
     }
 
-    // sorting manual (insertion sort)
-    // sesuai materi algoritma, gak pake Collections.sort
+    // Menu utama pengurutan: pilih mau urutin berdasarkan apa
     static void sortProduct() {
         System.out.println("═══ URUTKAN PRODUK ═══");
         System.out.println("Pilih urutkan produk berdasarkan:");
@@ -538,7 +580,7 @@ public class InventoryManagement {
         }
     }
 
-   
+    // Urutin produk berdasarkan ID (pake insertion sort)
     static void sortProductByID() {
         String metodeSorting = "";
         System.out.println("Pilih metode pengurutan produk:");
@@ -564,29 +606,30 @@ public class InventoryManagement {
                 return;
         }
 
-        // Insertion sort manual (buat ID integer)
+        // Insertion sort manual array biasa
         int pass = 1;
-        while (pass < inventory.size()) {
-            Product temp = inventory.get(pass);
+        while (pass < productCount) {
+            Product temp = inventory[pass];
             int i = pass;
             if (metodeSorting.equals("ascending")) {
-                while ((i > 0) && (temp.id < inventory.get(i-1).id)) {
-                    inventory.set(i, inventory.get(i-1));
+                while ((i > 0) && (temp.id < inventory[i-1].id)) {
+                    inventory[i] = inventory[i-1];
                     i--;
                 }
             }
             else if (metodeSorting.equals("descending")) {
-                while ((i > 0) && (temp.id > inventory.get(i-1).id)) {
-                    inventory.set(i, inventory.get(i-1));
+                while ((i > 0) && (temp.id > inventory[i-1].id)) {
+                    inventory[i] = inventory[i-1];
                     i--;
                 }
             }
-            inventory.set(i, temp);
+            inventory[i] = temp;
             pass++;
         }
         System.out.printf("Produk berhasil diurutkan berdasarkan ID secara %s!\n", metodeSorting);
     }
 
+    // Urutin produk berdasarkan nama (string, case-insensitive)
     static void sortProductByName() {
         String metodeSorting = "";
         System.out.println("Pilih metode pengurutan produk:");
@@ -613,28 +656,28 @@ public class InventoryManagement {
         }
 
         int pass = 1;
-        while (pass < inventory.size()) {
-            Product temp = inventory.get(pass);
+        while (pass < productCount) {
+            Product temp = inventory[pass];
             int i = pass;
             if (metodeSorting.equals("ascending")) {
-                while ((i > 0) && (temp.nama.compareToIgnoreCase(inventory.get(i-1).nama) < 0)) {
-                    inventory.set(i, inventory.get(i-1));
+                while ((i > 0) && (temp.nama.compareToIgnoreCase(inventory[i-1].nama) < 0)) {
+                    inventory[i] = inventory[i-1];
                     i--;
                 }
             }
             else if (metodeSorting.equals("descending")) {
-                while ((i > 0) && (temp.nama.compareToIgnoreCase(inventory.get(i-1).nama) > 0)) {
-                    inventory.set(i, inventory.get(i-1));
+                while ((i > 0) && (temp.nama.compareToIgnoreCase(inventory[i-1].nama) > 0)) {
+                    inventory[i] = inventory[i-1];
                     i--;
                 }
             }
-            inventory.set(i, temp);
+            inventory[i] = temp;
             pass++;
         }
         System.out.printf("Produk berhasil diurutkan berdasarkan Nama secara %s!\n", metodeSorting);
     }
 
-
+    // Urutin produk berdasarkan merek (string)
     static void sortProductByBrand() {
         String metodeSorting = "";
         System.out.println("Pilih metode pengurutan produk:");
@@ -661,27 +704,28 @@ public class InventoryManagement {
         }
 
         int pass = 1;
-        while (pass < inventory.size()) {
-            Product temp = inventory.get(pass);
+        while (pass < productCount) {
+            Product temp = inventory[pass];
             int i = pass;
             if (metodeSorting.equals("ascending")) {
-                while ((i > 0) && (temp.merek.compareToIgnoreCase(inventory.get(i-1).merek) < 0)) {
-                    inventory.set(i, inventory.get(i-1));
+                while ((i > 0) && (temp.merek.compareToIgnoreCase(inventory[i-1].merek) < 0)) {
+                    inventory[i] = inventory[i-1];
                     i--;
                 }
             }
             else if (metodeSorting.equals("descending")) {
-                while ((i > 0) && (temp.merek.compareToIgnoreCase(inventory.get(i-1).merek) > 0)) {
-                    inventory.set(i, inventory.get(i-1));
+                while ((i > 0) && (temp.merek.compareToIgnoreCase(inventory[i-1].merek) > 0)) {
+                    inventory[i] = inventory[i-1];
                     i--;
                 }
             }
-            inventory.set(i, temp);
+            inventory[i] = temp;
             pass++;
         }
         System.out.printf("Produk berhasil diurutkan berdasarkan Merek secara %s!\n", metodeSorting);
     }
 
+    // Urutin produk berdasarkan kategori (string)
     static void sortProductByCategory() {
         String metodeSorting = "";
         System.out.println("Pilih metode pengurutan produk:");
@@ -708,28 +752,28 @@ public class InventoryManagement {
         }
 
         int pass = 1;
-        while (pass < inventory.size()) {
-            Product temp = inventory.get(pass);
+        while (pass < productCount) {
+            Product temp = inventory[pass];
             int i = pass;
             if (metodeSorting.equals("ascending")) {
-                while ((i > 0) && (temp.kategori.compareToIgnoreCase(inventory.get(i-1).kategori) < 0)) {
-                    inventory.set(i, inventory.get(i-1));
+                while ((i > 0) && (temp.kategori.compareToIgnoreCase(inventory[i-1].kategori) < 0)) {
+                    inventory[i] = inventory[i-1];
                     i--;
                 }
             }
             else if (metodeSorting.equals("descending")) {
-                while ((i > 0) && (temp.kategori.compareToIgnoreCase(inventory.get(i-1).kategori) > 0)) {
-                    inventory.set(i, inventory.get(i-1));
+                while ((i > 0) && (temp.kategori.compareToIgnoreCase(inventory[i-1].kategori) > 0)) {
+                    inventory[i] = inventory[i-1];
                     i--;
                 }
             }
-            inventory.set(i, temp);
+            inventory[i] = temp;
             pass++;
         }
         System.out.printf("Produk berhasil diurutkan berdasarkan Kategori secara %s!\n", metodeSorting);
     }
     
-    // Urutin produk berdasarkan harga dalam bilangan real
+    // Urutin produk berdasarkan harga (double)
     static void sortProductByPrice() {
         String metodeSorting = "";
         System.out.println("Pilih metode pengurutan produk:");
@@ -756,22 +800,22 @@ public class InventoryManagement {
         }
 
         int pass = 1;
-        while (pass < inventory.size()) {
-            Product temp = inventory.get(pass);
+        while (pass < productCount) {
+            Product temp = inventory[pass];
             int i = pass;
             if (metodeSorting.equals("ascending")) {
-                while (i > 0 && inventory.get(i - 1).harga > temp.harga) {
-                    inventory.set(i, inventory.get(i-1));
+                while (i > 0 && inventory[i - 1].harga > temp.harga) {
+                    inventory[i] = inventory[i-1];
                     i--;
                 }
             }
             else if (metodeSorting.equals("descending")) {
-                while (i > 0 && inventory.get(i - 1).harga < temp.harga) {
-                    inventory.set(i, inventory.get(i-1));
+                while (i > 0 && inventory[i - 1].harga < temp.harga) {
+                    inventory[i] = inventory[i-1];
                     i--;
                 }
             }
-            inventory.set(i, temp);
+            inventory[i] = temp;
             pass++;
         }
         System.out.printf("Produk berhasil diurutkan berdasarkan Harga secara %s!\n", metodeSorting);
@@ -804,29 +848,28 @@ public class InventoryManagement {
         }
 
         int pass = 1;
-        while (pass < inventory.size()) {
-            Product temp = inventory.get(pass);
+        while (pass < productCount) {
+            Product temp = inventory[pass];
             int i = pass;
             if (metodeSorting.equals("ascending")) {
-                while ((i > 0) && (temp.stok < inventory.get(i-1).stok)) {
-                    inventory.set(i, inventory.get(i-1));
+                while ((i > 0) && (temp.stok < inventory[i-1].stok)) {
+                    inventory[i] = inventory[i-1];
                     i--;
                 }
             }
             else if (metodeSorting.equals("descending")) {
-                while ((i > 0) && (temp.stok > inventory.get(i-1).stok)) {
-                    inventory.set(i, inventory.get(i-1));
+                while ((i > 0) && (temp.stok > inventory[i-1].stok)) {
+                    inventory[i] = inventory[i-1];
                     i--;
                 }
             }
-            inventory.set(i, temp);
+            inventory[i] = temp;
             pass++;
         }
         System.out.printf("Produk berhasil diurutkan berdasarkan Stok secara %s!\n", metodeSorting);
     }
 
-    // proses transaksi sederhana
-    // cek stok dulu sebelum dikurangin
+    // Fitur transaksi: input ID, jumlah, cek stok, kurangin stok, tampilin struk
     static void transactionProduct() {
         System.out.println("═══ TRANSAKSI PRODUK ═══");
         
@@ -861,6 +904,8 @@ public class InventoryManagement {
             System.out.println("✗ Stok produk tidak mencukupi! Sisa stok saat ini: " + p.stok);
             return;
         }
+
+        // Hitung total harga
         double totalHargaBeli = p.harga * jmlhBeli;
         System.out.printf("Total harga yang harus dibayar: Rp %.0f\n", totalHargaBeli);
         
@@ -892,7 +937,7 @@ public class InventoryManagement {
         }
     }
 
-    // fungsi buat ngerapiin struk kalo nama barangnya kepanjangan
+    // Bantu formatting struk biar rapi kalo teksnya panjang
     static void transactionWrappedLine(String label, String value, int wrapLimit) {
         int idx = 0;
 
@@ -916,6 +961,7 @@ public class InventoryManagement {
         }
     }
 
+    // Header tabel buat tampilin data produk
     static void tampilkanHeader() {
         System.out.println("┌──────┬──────────────────────┬─────────────────┬─────────────────┬────────────────┬───────┐");
         System.out.println("│  ID  │ Nama Produk          │ Merek           │ Kategori        │ Harga          │ Stok  │");
