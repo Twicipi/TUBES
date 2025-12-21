@@ -72,7 +72,7 @@ public class InventoryManagement {
                     // - Validasi stok cukup atau engga
                     // - Kurangi stok, hitung total harga
                     // - Tampilkan struk transaksi
-                    System.out.println(">>> FITUR INI DIKERJAIN ARUL <<<");
+                    transactionProduct();
                     break;
                 case 8:
                     tampilkanLaporan();
@@ -105,7 +105,7 @@ public class InventoryManagement {
         System.out.println("4. Hapus Produk");
         System.out.println("5. Cari Produk");
         System.out.println("6. Urutkan Produk");
-        System.out.println("7. Proses Transaksi (ARUL)");
+        System.out.println("7. Proses Transaksi");
         System.out.println("8. Tampilkan Laporan");
         System.out.println("0. Keluar");
         System.out.println("════════════════════════════════════════════════");
@@ -514,13 +514,13 @@ public class InventoryManagement {
     static void sortProduct() {
         System.out.println("═══ URUTKAN PRODUK ═══");
         System.out.println("Pilih urutkan produk berdasarkan:");
-        System.out.println(" 1. ID");
-        System.out.println(" 2. Nama");
-        System.out.println(" 3. Merek");
-        System.out.println(" 4. Kategori");
-        System.out.println(" 5. Harga");
-        System.out.println(" 6. Stok");
-        System.out.println(" 0. Batalkan Pengurutan");
+        System.out.println("1. ID");
+        System.out.println("2. Nama");
+        System.out.println("3. Merek");
+        System.out.println("4. Kategori");
+        System.out.println("5. Harga");
+        System.out.println("6. Stok");
+        System.out.println("0. Batalkan Pengurutan");
         System.out.print("Pilihan: ");
         int pilihan = scanner.nextInt();
         scanner.nextLine();
@@ -543,10 +543,10 @@ public class InventoryManagement {
                 sortProductByCategory();
                 break;
             case 5: // Harga Produk
-                sortProductByCategory();
+                sortProductByPrice();
                 break;
             case 6: // Stok Produk
-                sortProductByCategory();
+                sortProductByStock();
                 break;
             default:
                 System.out.println("Pilihan tidak valid!");
@@ -559,9 +559,9 @@ public class InventoryManagement {
     static void sortProductByID() {
         String metodeSorting = "";
         System.out.println("Pilih metode pengurutan produk:");
-        System.out.println(" 1. Ascending");
-        System.out.println(" 2. Descending");
-        System.out.println(" 0. Batalkan Pengurutan");
+        System.out.println("1. Ascending");
+        System.out.println("2. Descending");
+        System.out.println("0. Batalkan Pengurutan");
         System.out.print("Pilihan: ");
         int pilihan = scanner.nextInt();
         scanner.nextLine();
@@ -571,8 +571,10 @@ public class InventoryManagement {
                 System.out.println("✗ Pengurutan product dibatalkan!");
                 return;
             case 1:
+                metodeSorting = "ascending";
                 break;
             case 2:
+                metodeSorting = "descending";
                 break;
             default:
                 System.out.println("Pilihan tidak valid!");
@@ -601,16 +603,16 @@ public class InventoryManagement {
             inventory.set(i, temp);
             pass++;
         }
-        System.out.println("[DEBUG] Produk berhasil diurutkan berdasarkan ID secara descending!");
+        System.out.printf("[DEBUG] Produk berhasil diurutkan berdasarkan Kategori secara %s!\n", metodeSorting);
     }
 
     // Insertion Sorting by Name
     static void sortProductByName() {
         String metodeSorting = "";
         System.out.println("Pilih metode pengurutan produk:");
-        System.out.println(" 1. Ascending");
-        System.out.println(" 2. Descending");
-        System.out.println(" 0. Batalkan Pengurutan");
+        System.out.println("1. Ascending");
+        System.out.println("2. Descending");
+        System.out.println("0. Batalkan Pengurutan");
         System.out.print("Pilihan: ");
         int pilihan = scanner.nextInt();
         scanner.nextLine();
@@ -660,9 +662,9 @@ public class InventoryManagement {
     static void sortProductByBrand() {
         String metodeSorting = "";
         System.out.println("Pilih metode pengurutan produk:");
-        System.out.println(" 1. Ascending");
-        System.out.println(" 2. Descending");
-        System.out.println(" 0. Batalkan Pengurutan");
+        System.out.println("1. Ascending");
+        System.out.println("2. Descending");
+        System.out.println("0. Batalkan Pengurutan");
         System.out.print("Pilihan: ");
         int pilihan = scanner.nextInt();
         scanner.nextLine();
@@ -712,9 +714,9 @@ public class InventoryManagement {
     static void sortProductByCategory() {
         String metodeSorting = "";
         System.out.println("Pilih metode pengurutan produk:");
-        System.out.println(" 1. Ascending");
-        System.out.println(" 2. Descending");
-        System.out.println(" 0. Batalkan Pengurutan");
+        System.out.println("1. Ascending");
+        System.out.println("2. Descending");
+        System.out.println("0. Batalkan Pengurutan");
         System.out.print("Pilihan: ");
         int pilihan = scanner.nextInt();
         scanner.nextLine();
@@ -764,9 +766,9 @@ public class InventoryManagement {
     static void sortProductByPrice() {
         String metodeSorting = "";
         System.out.println("Pilih metode pengurutan produk:");
-        System.out.println(" 1. Ascending");
-        System.out.println(" 2. Descending");
-        System.out.println(" 0. Batalkan Pengurutan");
+        System.out.println("1. Ascending (Harga Terendah - Tertinggi)");
+        System.out.println("2. Descending (Harga Tertinggi - Terendah)");
+        System.out.println("0. Batalkan Pengurutan");
         System.out.print("Pilihan: ");
         int pilihan = scanner.nextInt();
         scanner.nextLine();
@@ -776,8 +778,10 @@ public class InventoryManagement {
                 System.out.println("✗ Pengurutan product dibatalkan!");
                 return;
             case 1:
+                metodeSorting = "ascending";
                 break;
             case 2:
+                metodeSorting = "descending";
                 break;
             default:
                 System.out.println("Pilihan tidak valid!");
@@ -791,14 +795,14 @@ public class InventoryManagement {
             int i = pass;
             // Ascending
             if (metodeSorting.equals("ascending")) {
-                while ((i > 0) && (temp.harga < inventory.get(i-1).harga)) {
+                while (i > 0 && inventory.get(i - 1).harga > temp.harga) {
                     inventory.set(i, inventory.get(i-1));
                     i--;
                 }
             }
             // Descending
             else if (metodeSorting.equals("descending")) {
-                while ((i > 0) && (temp.harga > inventory.get(i-1).harga)) {
+                while (i > 0 && inventory.get(i - 1).harga < temp.harga) {
                     inventory.set(i, inventory.get(i-1));
                     i--;
                 }
@@ -806,16 +810,16 @@ public class InventoryManagement {
             inventory.set(i, temp);
             pass++;
         }
-        System.out.println("[DEBUG] Produk berhasil diurutkan berdasarkan Harga secara descending!");
+        System.out.printf("[DEBUG] Produk berhasil diurutkan berdasarkan Kategori secara %s!\n", metodeSorting);
     }
     
     // Insertion Sorting by Stock
     static void sortProductByStock() {
         String metodeSorting = "";
         System.out.println("Pilih metode pengurutan produk:");
-        System.out.println(" 1. Ascending");
-        System.out.println(" 2. Descending");
-        System.out.println(" 0. Batalkan Pengurutan");
+        System.out.println("1. Ascending (Harga Terendah - Tertinggi)");
+        System.out.println("2. Descending (Harga Tertinggi - Terendah)");
+        System.out.println("0. Batalkan Pengurutan");
         System.out.print("Pilihan: ");
         int pilihan = scanner.nextInt();
         scanner.nextLine();
@@ -825,8 +829,10 @@ public class InventoryManagement {
                 System.out.println("✗ Pengurutan product dibatalkan!");
                 return;
             case 1:
+                metodeSorting = "ascending";
                 break;
             case 2:
+                metodeSorting = "descending";
                 break;
             default:
                 System.out.println("Pilihan tidak valid!");
@@ -855,7 +861,104 @@ public class InventoryManagement {
             inventory.set(i, temp);
             pass++;
         }
-        System.out.println("[DEBUG] Produk berhasil diurutkan berdasarkan Stok secara descending!");
+        System.out.printf("[DEBUG] Produk berhasil diurutkan berdasarkan Kategori secara %s!\n", metodeSorting);
+    }
+
+    // Transaction Process Function
+    static void transactionProduct() {
+        System.out.println("═══ TRANSAKSI PRODUK ═══");
+        
+        System.out.print("Masukkan ID produk yang ingin dibeli: ");
+        int id = scanner.nextInt();
+        scanner.nextLine();
+        
+        Product p = cariProdukById(id);
+        
+        if(p == null) {
+            System.out.println("✗ Produk dengan ID " + id + " tidak ditemukan!");
+            return;
+        }
+
+        // Menampilkan id produk yang telah di pilih dan akan melakukan input jumlah produk yang igin di beli.
+        System.out.println();
+        System.out.println("═══ TRANSAKSI PRODUK ═══");
+        System.out.println("ID Produk yang dipilih:");
+        tampilkanHeader();
+        p.displayInfo();
+        tampilkanFooter();
+
+        // Input jumlah pemelian produk
+        System.out.print("\nMasukkan jumlah yang ingin dibeli: ");
+        int jmlhBeli = scanner.nextInt();
+        scanner.nextLine();
+        
+        // Cek stok produk
+        if (jmlhBeli <= 0) {
+            System.out.println("═══ TRANSAKSI PRODUK ═══");
+            System.out.println("✗ Jumlah pembelian minimal 1!");
+            return;
+        }
+        if (jmlhBeli > p.stok) {
+            System.out.println("═══ TRANSAKSI PRODUK ═══");
+            System.out.println("✗ Stok produk tidak mencukupi! Sisa stok saat ini: " + p.stok);
+            return;
+        }
+
+        // Menghitung total buy price
+        double totalHargaBeli = p.harga * jmlhBeli;
+        System.out.println("═══ TRANSAKSI PRODUK ═══");
+        System.out.printf("Total harga yang harus dibayar: Rp %.0f\n", totalHargaBeli);
+        
+        System.out.print("Lanjutkan pembayaran? (y/n): ");
+        String konfirmasi = scanner.nextLine();
+
+        if (konfirmasi.equals("y")) {
+            // Mengurangi stok produk yang dibeli
+            p.stok = p.stok - jmlhBeli;
+            String hargaFormatted = "Rp " + Math.round(p.harga);
+            String totalHargaFormatted = "Rp " + Math.round(totalHargaBeli);
+
+            // Struk transaksi
+            System.out.println("\n");
+            System.out.println("┌──────────────────────────────────────┐");
+            System.out.println("│           STRUK PEMBELIAN            │");
+            System.out.println("├──────────────────────────────────────┤");
+            transactionWrappedLine("ID Produk", p.id + "", 20);
+            transactionWrappedLine("Nama Produk", p.nama, 20);
+            transactionWrappedLine("Merek", p.merek, 20);
+            transactionWrappedLine("Harga", hargaFormatted, 20);
+            transactionWrappedLine("Jumlah Beli", jmlhBeli + "", 20);
+            System.out.println("├──────────────────────────────────────┤");
+            transactionWrappedLine("Total Harga", totalHargaFormatted, 20);
+            System.out.println("└──────────────────────────────────────┘");
+            System.out.println("✓ Transaksi telah berhasil! Stok produk telah diperbarui.");
+        } else {
+            System.out.println("✗ Transaksi dibatalkan!");
+        }
+    }
+
+    // Function Helper untuk merapihkan nama/angka yang telalu panjang di struk pembelian.
+    static void transactionWrappedLine(String label, String value, int wrapLimit) {
+        int idx = 0;
+
+        if (value == null) {
+            value = "";
+        }
+
+        if (value.isEmpty()) {
+            System.out.printf("| %-14s %-20s |\n", label, "");
+            return;
+        }
+        while (idx < value.length()) {
+            int endIdx = Math.min(idx + wrapLimit, value.length());
+            String cutString = value.substring(idx, endIdx);
+            if (idx == 0) {
+                System.out.printf("| %-13s : %-20s |\n", label, cutString);
+            } else {
+                System.out.printf("| %-13s   %-20s |\n", "", cutString);
+            }
+            idx += wrapLimit;
+        }
     }
 
 
