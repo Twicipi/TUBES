@@ -2,10 +2,9 @@ import java.util.Scanner;
 
 public class InventoryManagement {
     
-    // Data storage diganti ke Array biasa
-    static final int MAX_PRODUK = 100; // Kapasitas maksimal array
+    static final int MAX_PRODUK = 100; // Kapasitas maksimal produk di toko
     static Product[] inventory = new Product[MAX_PRODUK];
-    static int productCount = 0; // Untuk melacak jumlah produk saat ini
+    static int productCount = 0; // Untuk tracking jumlah produk saat ini
     
     static Scanner scanner = new Scanner(System.in);
     static int nextId = 1;  // buat auto increment ID produk
@@ -36,7 +35,7 @@ public class InventoryManagement {
     }
     
     public static void main(String[] args) {
-        // Isi data awal biar gak kosong pas demo
+        // Pengisian produk awal di toko
         tambahProdukOtomatis("Laptop ASUS ROG", "ASUS", "Laptop", 15000000, 5);
         tambahProdukOtomatis("iPhone 15 Pro", "Apple", "Smartphone", 18000000, 10);
         tambahProdukOtomatis("Samsung Galaxy S24", "Samsung", "Smartphone", 12000000, 8);
@@ -46,35 +45,45 @@ public class InventoryManagement {
             tampilkanMenu();
             System.out.print("Pilih menu: ");
             pilihan = scanner.nextInt();
-            scanner.nextLine(); // buat clear buffer
+            scanner.nextLine(); // untuk mengatasi buffering
             
             System.out.println();
             
             switch(pilihan) {
                 case 1:
+                    // Fitur untuk menambahkan product ke inventaris toko
                     tambahProduk();
                     break;
                 case 2:
+                    // Fitur untuk menampilkan semua produk di inventaris toko
                     tampilkanSemuaProduk();
                     break;
                 case 3:
+                    // Fitur untuk mengedit produk yang sudah ada di inventaris toko
                     editProduk();
                     break;
                 case 4:
+                    // Fitur untuk menghapus produk yang ada di inventaris toko
                     hapusProduk();
                     break;
                 case 5:
-                    searchProduct(); // fitur cari produk
+                    // Fitur untuk mencari produk yang tersedia
+                    // Bisa mencari berdasarkan ID, Nama, Merek, dan Kategori
+                    searchProduct();
                     break;
                 case 6:
-                    sortProduct(); // fitur urutin produk
+                    // Fitur untuk mengurutkan produk yang tersedia
+                    // Bisa mencari berdasarkan ID, Nama, Merek, Kategori, Harga, dan Stok
+                    sortProduct();
                     break;
                 case 7:
-                    // Fitur transaksi: input ID & jumlah, cek stok, kurangin stok, tampilin struk
+                    // Fitur untuk proses transaksi pembelian produk
+                    // Pembelian produk berdasarkan ID, bisa mengatur jumlah pembelian, dan terdapat struk pembelian.
                     transactionProduct();
                     break;
                 case 8:
-                    tampilkanLaporan(); // tampilin total produk, stok, dan stok menipis
+                    // tampilin total produk, stok, dan stok menipis
+                    tampilkanLaporan(); 
                     break;
                 case 0:
                     System.out.println("Terima kasih! Program selesai.");
@@ -133,18 +142,17 @@ public class InventoryManagement {
         
         System.out.print("Stok: ");
         int stok = scanner.nextInt();
-        scanner.nextLine(); // bersihin newline setelah nextInt
+        scanner.nextLine();
         
         Product produkBaru = new Product(nextId++, nama, merek, kategori, harga, stok);
         
-        // Ganti inventory.add() dengan array assignment
         inventory[productCount] = produkBaru;
         productCount++;
         
         System.out.println("\n✓ Produk berhasil ditambahkan dengan ID: " + produkBaru.id);
     }
     
-    // Fungsi bantu buat nambahin data awal (biar gak repot demo)
+    // Fungsi bantu buat menambahkan data awal
     static void tambahProdukOtomatis(String nama, String merek, String kategori, double harga, int stok) {
         if (productCount < MAX_PRODUK) {
             inventory[productCount] = new Product(nextId++, nama, merek, kategori, harga, stok);
@@ -154,7 +162,6 @@ public class InventoryManagement {
     
     // Tampilin semua produk dalam bentuk tabel
     static void tampilkanSemuaProduk() {
-        // Ganti isEmpty() dengan cek count
         if(productCount == 0) {
             System.out.println("Inventory masih kosong!");
             return;
@@ -163,7 +170,6 @@ public class InventoryManagement {
         System.out.println("═══ DAFTAR SEMUA PRODUK ═══");
         tampilkanHeader();
         
-        // Loop manual menggunakan index
         for(int i = 0; i < productCount; i++) {
             inventory[i].displayInfo();
         }
@@ -246,7 +252,7 @@ public class InventoryManagement {
         System.out.println("\n✓ Produk berhasil diupdate!");
     }
     
-    // Hapus produk berdasarkan ID (ada konfirmasi dulu)
+    // Hapus produk berdasarkan ID
     static void hapusProduk() {
         System.out.println("═══ HAPUS PRODUK ═══");
         
@@ -279,12 +285,11 @@ public class InventoryManagement {
         String konfirmasi = scanner.nextLine();
         
         if(konfirmasi.equalsIgnoreCase("y")) {
-            // Logic hapus di array: geser semua elemen setelah index ke kiri
             for (int i = indexFound; i < productCount - 1; i++) {
                 inventory[i] = inventory[i + 1];
             }
-            inventory[productCount - 1] = null; // Hapus referensi terakhir
-            productCount--; // Kurangi jumlah
+            inventory[productCount - 1] = null;
+            productCount--;
             
             System.out.println("✓ Produk berhasil dihapus!");
         } else {
@@ -292,7 +297,8 @@ public class InventoryManagement {
         }
     }
     
-    // Tampilin laporan: total produk, total stok, total nilai, dan stok menipis
+    // Menampilkan laporan toko
+    // Berisi total produk, total stok, total nilai, dan stok menipis
     static void tampilkanLaporan() {
         if(productCount == 0) {
             System.out.println("Inventory masih kosong!");
@@ -336,7 +342,7 @@ public class InventoryManagement {
         }
     }
     
-    // Cari produk berdasarkan ID (return null kalo gak ketemu)
+    // Cari produk berdasarkan ID
     static Product cariProdukById(int id) {
         for(int i = 0; i < productCount; i++) {
             if(inventory[i].id == id) {
@@ -346,7 +352,8 @@ public class InventoryManagement {
         return null;
     }
     
-    // Menu utama pencarian: pilih mau cari pake ID, nama, merek, atau kategori
+    // Menu utama search product
+    // Pilih bisa cari bebrdasarkan ID, nama, merek, atau kategori
     static void searchProduct() {
         System.out.println("═══ CARI PRODUK ═══");
         System.out.println("Pilih pencarian berdasarkan:");
@@ -382,7 +389,7 @@ public class InventoryManagement {
         }
     }
 
-    // Cari produk berdasarkan ID (exact match)
+    // Cari produk berdasarkan ID
     static void searchProductByID() {
         System.out.print("\nMasukkan ID: ");
         int keyword = scanner.nextInt();
@@ -407,7 +414,7 @@ public class InventoryManagement {
         }
     }
 
-    // Cari produk berdasarkan nama (case-insensitive dan boleh partial)
+    // Cari produk berdasarkan nama (case-insensitive)
     static void searchProductByName() {
         System.out.print("\nMasukkan nama: ");
         String keyword = scanner.nextLine();
@@ -431,16 +438,14 @@ public class InventoryManagement {
         }
     }
 
-    // Cari produk berdasarkan merek (tampilin dulu list merek yang ada)
+    // Cari produk berdasarkan merek
     static void searchProductByBrand() {
-        // Ganti ArrayList dengan Array string biasa
         String[] listMerek = new String[productCount];
         int countMerek = 0;
 
         for (int i = 0; i < productCount; i++) {
             Product p = inventory[i];
             boolean merekSudahAda = false;
-            // Cek manual di array listMerek
             for (int j = 0; j < countMerek; j++) {
                 if (listMerek[j].equalsIgnoreCase(p.merek)) {
                     merekSudahAda = true;
@@ -484,9 +489,8 @@ public class InventoryManagement {
         }
     }
 
-    // Cari produk berdasarkan kategori (tampilin dulu list kategori yang ada)
+    // Cari produk berdasarkan kategori
     static void searchProductByCategory() {
-        // Ganti ArrayList dengan Array string biasa
         String[] listKategori = new String[productCount];
         int countKategori = 0;
 
@@ -536,7 +540,8 @@ public class InventoryManagement {
         }
     }
 
-    // Menu utama pengurutan: pilih mau urutin berdasarkan apa
+    // Menu utama sorting product
+    // Bisa mengurutkan bedasarkan ID, Nama, Merek, Kategori, Harga, Stok
     static void sortProduct() {
         System.out.println("═══ URUTKAN PRODUK ═══");
         System.out.println("Pilih urutkan produk berdasarkan:");
@@ -580,7 +585,7 @@ public class InventoryManagement {
         }
     }
 
-    // Urutin produk berdasarkan ID (pake insertion sort)
+    // Mengurutkan produk berdasarkan ID (menggunakan insertion sort)
     static void sortProductByID() {
         String metodeSorting = "";
         System.out.println("Pilih metode pengurutan produk:");
@@ -606,7 +611,6 @@ public class InventoryManagement {
                 return;
         }
 
-        // Insertion sort manual array biasa
         int pass = 1;
         while (pass < productCount) {
             Product temp = inventory[pass];
@@ -629,7 +633,7 @@ public class InventoryManagement {
         System.out.printf("Produk berhasil diurutkan berdasarkan ID secara %s!\n", metodeSorting);
     }
 
-    // Urutin produk berdasarkan nama (string, case-insensitive)
+    // Mengurutkan produk berdasarkan nama (string, case-insensitive)
     static void sortProductByName() {
         String metodeSorting = "";
         System.out.println("Pilih metode pengurutan produk:");
@@ -677,7 +681,7 @@ public class InventoryManagement {
         System.out.printf("Produk berhasil diurutkan berdasarkan Nama secara %s!\n", metodeSorting);
     }
 
-    // Urutin produk berdasarkan merek (string)
+    // Mengurutkan produk berdasarkan merek (string)
     static void sortProductByBrand() {
         String metodeSorting = "";
         System.out.println("Pilih metode pengurutan produk:");
@@ -725,7 +729,7 @@ public class InventoryManagement {
         System.out.printf("Produk berhasil diurutkan berdasarkan Merek secara %s!\n", metodeSorting);
     }
 
-    // Urutin produk berdasarkan kategori (string)
+    // Mengurutkan produk berdasarkan kategori (string)
     static void sortProductByCategory() {
         String metodeSorting = "";
         System.out.println("Pilih metode pengurutan produk:");
@@ -773,7 +777,7 @@ public class InventoryManagement {
         System.out.printf("Produk berhasil diurutkan berdasarkan Kategori secara %s!\n", metodeSorting);
     }
     
-    // Urutin produk berdasarkan harga (double)
+    // Mengurutkan produk berdasarkan harga (double)
     static void sortProductByPrice() {
         String metodeSorting = "";
         System.out.println("Pilih metode pengurutan produk:");
@@ -821,7 +825,7 @@ public class InventoryManagement {
         System.out.printf("Produk berhasil diurutkan berdasarkan Harga secara %s!\n", metodeSorting);
     }
     
-    // Urutin produk berdasarkan stok (integer)
+    // Mengurutkan produk berdasarkan stok (integer)
     static void sortProductByStock() {
         String metodeSorting = "";
         System.out.println("Pilih metode pengurutan produk:");
@@ -869,7 +873,9 @@ public class InventoryManagement {
         System.out.printf("Produk berhasil diurutkan berdasarkan Stok secara %s!\n", metodeSorting);
     }
 
-    // Fitur transaksi: input ID, jumlah, cek stok, kurangin stok, tampilin struk
+    // Fitur proses transaksi
+    // Sistem pembelian berdasarkan ID Produk yang ingin dibeli, dapat mengatur
+    // jumlah pembelian produk dan akan menampilkan struk pembelian setelah menyelesaikan pembayaran
     static void transactionProduct() {
         System.out.println("═══ TRANSAKSI PRODUK ═══");
         
@@ -937,7 +943,7 @@ public class InventoryManagement {
         }
     }
 
-    // Bantu formatting struk biar rapi kalo teksnya panjang
+    // Bantu formatting struk biar rapi kalau teksnya terlalu panjang
     static void transactionWrappedLine(String label, String value, int wrapLimit) {
         int idx = 0;
 
@@ -964,7 +970,7 @@ public class InventoryManagement {
     // Header tabel buat tampilin data produk
     static void tampilkanHeader() {
         System.out.println("┌──────┬──────────────────────┬─────────────────┬─────────────────┬────────────────┬───────┐");
-        System.out.println("│  ID  │ Nama Produk          │ Merek           │ Kategori        │ Harga          │ Stok  │");
+        System.out.println("│  ID  │     Nama Produk          │ Merek           │ Kategori        │ Harga          │ Stok  │");
         System.out.println("├──────┼──────────────────────┼─────────────────┼─────────────────┼────────────────┼───────┤");
     }
     
