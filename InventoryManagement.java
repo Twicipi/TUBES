@@ -970,7 +970,7 @@ public class InventoryManagement {
     // Header tabel buat tampilin data produk
     static void tampilkanHeader() {
         System.out.println("┌──────┬──────────────────────┬─────────────────┬─────────────────┬────────────────┬───────┐");
-        System.out.println("│  ID  │     Nama Produk          │ Merek           │ Kategori        │ Harga          │ Stok  │");
+        System.out.println("│  ID  │     Nama Produk      │      Merek      │     Kategori    │     Harga      │ Stok  │");
         System.out.println("├──────┼──────────────────────┼─────────────────┼─────────────────┼────────────────┼───────┤");
     }
     
